@@ -49,14 +49,19 @@ Use `dplyr` functions to create a table with the number of candidates in each ty
 library(tidyverse)
 library(knitr)
 library(dplyr)
+
 fb_ads <- read_csv("data/fb_ads.csv")
 fb_ads
-number_of_candidates <- fb_ads
-print(number_of_candidates)
+
+number_of_candidates <- fb_ads |>
+  distinct(cand_name) |>
+  nrow()
+
 incumbency_table <- fb_ads |>
   group_by(incumbency) |>
   summarise(number_of_candidates = cand_name)
 print(incumbency_table)
+
 knitr::kable(incumbency_table)
 ```
 The number of candidates is 7014.
@@ -154,7 +159,8 @@ fb_top_plot <- fb_ads |>
                          impressions_millions))) +
   geom_bar(stat = "identity",
            aes(fill = party)) +
-  labs(x = "Facebook Ad Impressions (in millions)",
+  labs(title = "Top 15 House Candidate Facebook Ad Impression, 2017-2018",
+       x = "Facebook Ad Impressions (in millions)",
        y= "Candidate Last Name") +
   scale_fill_manual(values = c(R = "red", D = "blue"))
 fb_top_plot
