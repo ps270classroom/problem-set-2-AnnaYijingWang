@@ -113,21 +113,23 @@ Create a histogram of this variable for just the US House races. Save the ggplot
 
 ```{r}
 library(ggplot2)
+
 fb_ads <- fb_ads |>
   mutate(impressions_millions = impressions / 1000000)
 
 plot_q3 <- fb_ads |>
   filter(office == "US House") |>
   slice_max(order_by = impressions_millions, n = 15) |>
-  ggplot(data = fb_ads,
-         mapping = aes(x = impressions_millions,
+  ggplot(mapping = aes(x = impressions_millions,
                        y = cand_name_last)) +
   geom_histogram(stat = "identity", 
                  aes(fill = party),
-                 na.rm = TRUE)
+                 na.rm = TRUE) +
+  labs(x = "Impressions (in millions)",
+       title = "Distribution of Facebook Ad Impression for US House Candidates")
 print(plot_q3)
 ```
-The shape of the histogram is right-skewed, and most of the House candidates did not reach 10 million Facebook ad.
+The shape of the histogram is right-skewed, and most of the House candidates reached 10 million Facebook ad.
 
 \newpage
 
@@ -150,19 +152,22 @@ You do not need to exactly match the labels, but you should have informative lab
 
 ## Answer 4
 ```{r}
-fb_top_plot <- fb_ads |>
+top_cand <- fb_ads |>
   filter(office == "US House") |>
   arrange(desc(impressions_millions)) |>
   slice_max(order_by = impressions_millions, n = 15) |>
-  ggplot(aes(x = impressions_millions,
-             y = reorder(cand_name_last,
-                         impressions_millions))) +
+  mutate(cand_name_last = reorder(cand_name_last, impressions_millions))
+
+fb_top_plot <- ggplot(top_cand, 
+                      aes(x = impressions_millions,
+                          y = cand_name_last)) +
   geom_bar(stat = "identity",
            aes(fill = party)) +
   labs(title = "Top 15 House Candidate Facebook Ad Impression, 2017-2018",
        x = "Facebook Ad Impressions (in millions)",
        y= "Candidate Last Name") +
   scale_fill_manual(values = c(R = "red", D = "blue"))
+  
 fb_top_plot
 ```
 
